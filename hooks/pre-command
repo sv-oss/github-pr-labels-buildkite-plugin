@@ -49,7 +49,7 @@ fi
 if [[ -n "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_PUBLISH_METADATA_KEY:-}" ]]; then
   metaDataKey="${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_PUBLISH_METADATA_KEY}"
   echo "~~~ :buildkite: publishing labels as meta-data key '${metaDataKey}'"
-  echo "${labels}" | buildkite-agent meta-data set "${metaDataKey}"
+  buildkite-agent meta-data set "${metaDataKey}" "${labels}"
 fi
 
 if [[ -n "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_PUBLISH_ENV_VAR:-}" ]]; then

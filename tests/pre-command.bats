@@ -150,7 +150,7 @@ load '/usr/local/lib/bats/load.bash'
   stub jq \
     '-r \[.labels\[\].name\]\ \|\ join\(\"\,\"\) : echo "labelone,labeltwo"'
   stub buildkite-agent \
-    'meta-data set myki : echo'
+    'meta-data set myki labelone,labeltwo : echo'
 
   run "$PWD/hooks/pre-command"
 
