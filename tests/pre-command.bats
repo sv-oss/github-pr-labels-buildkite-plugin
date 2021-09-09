@@ -100,6 +100,25 @@ load '/usr/local/lib/bats/load.bash'
   unstub jq
 }
 
+@test "ensure to let the user know the PR has no labels" {
+  export BUILDKITE_PIPELINE_PROVIDER="github"
+  export BUILDKITE_PULL_REQUEST="1"
+  export BUILDKITE_REPO="git://github.com:myorg/myrepo.git"
+
+  stub curl \
+    '-f -Ss https://api.github.com/repos/myorg/myrepo/pulls/1 : echo -n {\"labels\":[]}'
+  stub jq \
+    '-r \[.labels\[\].name\]\ \|\ join\(\"\,\"\) : echo ""'
+
+  run "$PWD/hooks/pre-command"
+
+  assert_success
+  assert_output --partial "PR #1 has no labels"
+  refute_output --partial  "publishing"
+
+  unstub curl
+  unstub jq
+}
 
 @test "ensure labels are correctly outputed" {
   export BUILDKITE_PIPELINE_PROVIDER="github"
@@ -114,7 +133,7 @@ load '/usr/local/lib/bats/load.bash'
   run "$PWD/hooks/pre-command"
 
   assert_success
-  assert_output --partial "labels for PR #1 are: labelone,labeltwo"
+  assert_output --partial "PR #1 has the following labels: labelone,labeltwo"
 
   unstub curl
   unstub jq
