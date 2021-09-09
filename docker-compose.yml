@@ -8,3 +8,8 @@ services:
     command: ['--id', 'sv-oss/github-pr-labels']
     volumes:
       - ".:/plugin:ro"
+  shellcheck:
+    image: koalaman/shellcheck:stable
+    command: ['--color=always', '/plugin/hooks/pre-command']
+    volumes:
+      - ".:/plugin:ro"
