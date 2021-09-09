@@ -26,6 +26,4 @@ configuration:
       type: string
     publish-metadata-key:
       type: string
-  required:
-    - token-from
   additionalProperties: false
