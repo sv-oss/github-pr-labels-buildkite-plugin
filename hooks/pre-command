@@ -41,6 +41,7 @@ fi
 
 if [[ -z "${labels}" ]]; then
   echo "~~~ :github: PR #${pullReqNo} has no labels"
+  exit 0
 else
   echo "~~~ :github: PR #${pullReqNo} has the following labels: ${labels}"
 fi

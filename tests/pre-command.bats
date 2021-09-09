@@ -114,6 +114,7 @@ load '/usr/local/lib/bats/load.bash'
 
   assert_success
   assert_output --partial "PR #1 has no labels"
+  refute_output --partial  "publishing"
 
   unstub curl
   unstub jq
