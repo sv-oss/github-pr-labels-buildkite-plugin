@@ -7,7 +7,7 @@ if [[ "${BUILDKITE_PIPELINE_PROVIDER:-}" != "github" ]] ; then
 fi
 
 if [[ "${BUILDKITE_PULL_REQUEST:-false}" == "false" ]] ; then
-  echo "⚠️ this doesn't appear to be a PR-build, skipping plugin execution" >&2
+  echo "⚠️  this doesn't appear to be a PR-build, skipping plugin execution" >&2
   exit 0
 fi
 pullReqNo="${BUILDKITE_PULL_REQUEST}"
