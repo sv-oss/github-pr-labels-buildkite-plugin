@@ -23,7 +23,7 @@ fi
 githubToken=""
 if [[ -n "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_FILE:-}" ]]; then
   echo "~~~ :clipboard: reading github token from file"
-  githubToken=$(< ${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_FILE})
+  githubToken=$(< "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_FILE}")
 elif [[ -n "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_ENV:-}" ]]; then
   echo "~~~ :clipboard: reading github token from env var"
   githubToken="${!BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_ENV}"
@@ -47,5 +47,5 @@ fi
 if [[ -n "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_PUBLISH_ENV_VAR:-}" ]]; then
   envVarName="${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_PUBLISH_ENV_VAR}"
   echo "~~~ :buildkite: publishing labels as env var '${envVarName}'"
-  declare -x ${envVarName}="${labels}"
+  declare -x "${envVarName}"="${labels}"
 fi
