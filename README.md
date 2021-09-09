@@ -8,7 +8,7 @@ Multiple labels will appear as comma-separated values.
 
 When using with a private repository, a valid GitHub token (PAT) must be provided.
 It can be provided either inside an environment variable or inside a file.
-Other plugins can be used before this plugin to set up the token.
+Other plugins can be used before this pluginddddd to set up the token.
 
 ## Examples
 
