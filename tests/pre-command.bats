@@ -41,22 +41,29 @@ load '/usr/local/lib/bats/load.bash'
   assert_output --partial "BUILDKITE_REPO variable has an unexpected format"
 }
 
-@test "ensure error when no token source is set" {
+@test "ensure warning when no token source is set" {
   export BUILDKITE_PIPELINE_PROVIDER="github"
   export BUILDKITE_PULL_REQUEST="1"
   export BUILDKITE_REPO="git://github.com:myorg/myrepo.git"
+  stub curl \
+    '-f -Ss https://api.github.com/repos/myorg/myrepo/pulls/1 : echo -n {"labels":[]}'
+  stub jq \
+    '-r \[.labels\[\].name\]\ \|\ join\(\"\,\"\) : echo ""'
 
   run "$PWD/hooks/pre-command"
 
-  assert_failure
+  assert_success
   assert_output --partial "configuration is missing a valid 'token-from' stanza"
+
+  unstub curl
+  unstub jq
 }
 
 @test "ensure token is read from file" {
   export BUILDKITE_PIPELINE_PROVIDER="github"
   export BUILDKITE_PULL_REQUEST="1"
   export BUILDKITE_REPO="git://github.com:myorg/myrepo.git"
-  export BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_FILE=/dev/null
+  export BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_FILE=/etc/issue
 
   stub curl \
     '-f -Ss -H @- https://api.github.com/repos/myorg/myrepo/pulls/1 : echo -n {"labels":[]}'
@@ -98,11 +105,9 @@ load '/usr/local/lib/bats/load.bash'
   export BUILDKITE_PIPELINE_PROVIDER="github"
   export BUILDKITE_PULL_REQUEST="1"
   export BUILDKITE_REPO="git://github.com:myorg/myrepo.git"
-  export BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_ENV=GITHUB_TOKEN
-  export GITHUB_TOKEN=mytoken
 
   stub curl \
-    '-f -Ss -H @- https://api.github.com/repos/myorg/myrepo/pulls/1 : echo -n {\"labels\":[]}'
+    '-f -Ss https://api.github.com/repos/myorg/myrepo/pulls/1 : echo -n {\"labels\":[]}'
   stub jq \
     '-r \[.labels\[\].name\]\ \|\ join\(\"\,\"\) : echo "labelone,labeltwo"'
 
@@ -119,12 +124,10 @@ load '/usr/local/lib/bats/load.bash'
   export BUILDKITE_PIPELINE_PROVIDER="github"
   export BUILDKITE_PULL_REQUEST="1"
   export BUILDKITE_REPO="git://github.com:myorg/myrepo.git"
-  export BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_ENV=GITHUB_TOKEN
-  export GITHUB_TOKEN=mytoken
   export BUILDKITE_PLUGIN_GITHUB_PR_LABELS_PUBLISH_METADATA_KEY="myki"
 
   stub curl \
-    '-f -Ss -H @- https://api.github.com/repos/myorg/myrepo/pulls/1 : echo -n {\"labels\":[]}'
+    '-f -Ss https://api.github.com/repos/myorg/myrepo/pulls/1 : echo -n {\"labels\":[]}'
   stub jq \
     '-r \[.labels\[\].name\]\ \|\ join\(\"\,\"\) : echo "labelone,labeltwo"'
   stub buildkite-agent \
@@ -145,12 +148,10 @@ load '/usr/local/lib/bats/load.bash'
   export BUILDKITE_PIPELINE_PROVIDER="github"
   export BUILDKITE_PULL_REQUEST="1"
   export BUILDKITE_REPO="git://github.com:myorg/myrepo.git"
-  export BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_ENV=GITHUB_TOKEN
-  export GITHUB_TOKEN=mytoken
   export BUILDKITE_PLUGIN_GITHUB_PR_LABELS_PUBLISH_ENV_VAR="MYENV"
 
   stub curl \
-    '-f -Ss -H @- https://api.github.com/repos/myorg/myrepo/pulls/1 : echo -n {\"labels\":[]}'
+    '-f -Ss https://api.github.com/repos/myorg/myrepo/pulls/1 : echo -n {\"labels\":[]}'
   stub jq \
     '-r \[.labels\[\].name\]\ \|\ join\(\"\,\"\) : echo "labelone,labeltwo"'
 

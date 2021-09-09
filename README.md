@@ -4,14 +4,28 @@ Retrieve the labels associated with a GitHub Pull Request and publish them as en
 
 Multiple labels will appear as comma-separated values.
 
-## Pre-requisites
+## Pre-requisites for private repositories
 
-A valid GitHub token (PAT) must be provided for this plugin to function. It can be provided either inside an environment variable or inside a file.
+When using with a private github repository, a valid GitHub token (PAT) must be provided.
+It can be provided either inside an environment variable or inside a file.
 Other plugins can be used before this plugin to set up the token.
 
 ## Examples
 
-### Publish the labels as environment variable
+### Publish the labels as environment variable (public repository)
+
+The comma-separated list of labels will be published in the `PULL_REQUEST_LABELS` environment variable.
+The variable is accessible to all subsequent commands and plugins within the same step.
+
+```yml
+steps:
+  - command: ls
+    plugins:
+      - sv-oss/github-pr-labels#v0.0.1:
+          publish-env-var: PULL_REQUEST_LABELS
+```
+
+### Publish the labels as environment variable (private repository)
 
 In this example a valid GitHub token has been pre-loaded inside the GITHUB_TOKEN environment variable
 
@@ -28,7 +42,7 @@ steps:
           publish-env-var: PULL_REQUEST_LABELS
 ```
 
-### Publish the labels as build meta-data
+### Publish the labels as build meta-data (private repository)
 
 In this example a valid GitHub token has been pre-loaded inside the /etc/github/token file
 

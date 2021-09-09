@@ -23,18 +23,21 @@ fi
 githubToken=""
 if [[ -n "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_FILE:-}" ]]; then
   echo "~~~ :clipboard: reading github token from file"
-  githubToken=$(< "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_FILE}")
+  githubToken=$(cat "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_FILE}")
 elif [[ -n "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_ENV:-}" ]]; then
   echo "~~~ :clipboard: reading github token from env var"
   githubToken="${!BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_ENV}"
 else
-  echo ":error: configuration is missing a valid 'token-from' stanza"
-  exit 3
+  echo ":warning: configuration is missing a valid 'token-from' stanza. requests to github will be unauthenticated"
 fi
 
 echo "~~~ :github: retrieving pull-request labels"
 jqFilter='[.labels[].name] | join(",")'
-labels=$(curl -f -Ss -H @- "https://api.github.com/repos/${repoFq}/pulls/${pullReqNo}" <<<"Authorization: Bearer ${githubToken}" | jq -r "$jqFilter" -)
+if [[ -z "${githubToken}" ]]; then
+  labels=$(curl -f -Ss "https://api.github.com/repos/${repoFq}/pulls/${pullReqNo}" | jq -r "$jqFilter" -)
+else
+  labels=$(curl -f -Ss -H @- "https://api.github.com/repos/${repoFq}/pulls/${pullReqNo}" <<<"Authorization: Bearer ${githubToken}" | jq -r "$jqFilter" -)
+fi
 
 echo "~~~ :github: labels for PR #${pullReqNo} are: ${labels}"
 
