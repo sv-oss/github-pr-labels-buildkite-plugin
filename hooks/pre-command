@@ -1,0 +1,51 @@
+#!/bin/bash
+set -euo pipefail
+
+if [[ "${BUILDKITE_PIPELINE_PROVIDER:-}" != "github" ]] ; then
+  echo ":error: this plugin can only be used on piplines associated with github repositories" >&2
+  exit 1
+fi
+
+if [[ "${BUILDKITE_PULL_REQUEST:-false}" == "false" ]] ; then
+  echo ":warning: this doesn't appear to be a PR-build, skipping plugin execution" >&2
+  exit 0
+fi
+pullReqNo="${BUILDKITE_PULL_REQUEST}"
+
+repoFq=""
+if [[ "${BUILDKITE_REPO:-}" =~ github.com[:/](.*).git[/]? ]]; then
+  repoFq="${BASH_REMATCH[1]}"
+else
+  echo ":error: the BUILDKITE_REPO variable has an unexpected format" >&2
+  exit 2
+fi
+
+githubToken=""
+if [[ -n "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_FILE:-}" ]]; then
+  echo "~~~ :clipboard: reading github token from file"
+  githubToken=$(< ${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_FILE})
+elif [[ -n "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_ENV:-}" ]]; then
+  echo "~~~ :clipboard: reading github token from env var"
+  githubToken="${!BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_ENV}"
+else
+  echo ":error: configuration is missing a valid 'token-from' stanza"
+  exit 3
+fi
+
+echo "~~~ :github: retrieving pull-request labels"
+jqFilter='[.labels[].name] | join(",")'
+labels=$(curl -f -Ss -H @- "https://api.github.com/repos/${repoFq}/pulls/${pullReqNo}" <<<"Authorization: Bearer ${githubToken}" | jq -r "$jqFilter" -)
+
+echo "~~~ :github: labels for PR #${pullReqNo} are: ${labels}"
+
+if [[ -n "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_PUBLISH_METADATA_KEY:-}" ]]; then
+  metaDataKey="${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_PUBLISH_METADATA_KEY}"
+  echo "~~~ :buildkite: publishing labels as meta-data key '${metaDataKey}'"
+  echo "${labels}" | buildkite-agent meta-data set "${metaDataKey}"
+fi
+
+if [[ -n "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_PUBLISH_ENV_VAR:-}" ]]; then
+  envVarName="${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_PUBLISH_ENV_VAR}"
+  echo "~~~ :buildkite: publishing labels as env var '${envVarName}'"
+  declare -x ${envVarName}="${labels}"
+fi

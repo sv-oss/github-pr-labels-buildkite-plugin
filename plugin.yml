@@ -1,0 +1,31 @@
+name: github-pr-labels
+description: Retrieve the labels attached to a PR build and expose them via env vars or meta-data
+author: https://github.com/msessa
+requirements:
+  - curl
+  - jq
+configuration:
+  definitions:
+    token-from-object:
+      type: object
+      properties:
+        env:
+          type: string
+        file:
+          type: string
+      oneOf:
+        - required:
+            - env
+        - required:
+            - file
+      additionalProperties: false
+  properties:
+    token-from:
+      $ref: "#/definitions/token-from-object"
+    publish-env-var:
+      type: string
+    publish-metadata-key:
+      type: string
+  required:
+    - token-from
+  additionalProperties: false
