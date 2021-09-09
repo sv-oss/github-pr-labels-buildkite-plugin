@@ -1,4 +1,4 @@
-# Github PR Labels Buildkite Plugin
+# GitHub PR Labels Buildkite Plugin
 
 Retrieve the labels associated with a GitHub Pull Request and publish them as environment variable and/or build meta-data.
 
@@ -6,7 +6,7 @@ Multiple labels will appear as comma-separated values.
 
 ## Pre-requisites for private repositories
 
-When using with a private github repository, a valid GitHub token (PAT) must be provided.
+When using with a private repository, a valid GitHub token (PAT) must be provided.
 It can be provided either inside an environment variable or inside a file.
 Other plugins can be used before this plugin to set up the token.
 
@@ -19,7 +19,7 @@ The variable is accessible to all subsequent commands and plugins within the sam
 
 ```yml
 steps:
-  - command: ls
+  - command: echo $$PULL_REQUEST_LABELS
     plugins:
       - sv-oss/github-pr-labels#v0.0.1:
           publish-env-var: PULL_REQUEST_LABELS
@@ -34,7 +34,7 @@ The variable is accessible to all subsequent commands and plugins within the sam
 
 ```yml
 steps:
-  - command: ls
+  - command: echo $$PULL_REQUEST_LABELS
     plugins:
       - sv-oss/github-pr-labels#v0.0.1:
           token-from:
@@ -51,20 +51,22 @@ The meta-data key is accessible on all subsequent steps of the pipeline.
 
 ```yml
 steps:
-  - command: ls
+  - command: buildkite-agent meta-data get pull-request-labels
     plugins:
       - sv-oss/github-pr-labels#v0.0.1:
           token-from:
             file: /etc/github/token
           publish-metadata-key: pull-request-labels
+  - wait: ~
+  - command: buildkite-agent meta-data get pull-request-labels
 ```
 ## Configuration
 
-### `token-from` ({file | env})
+### `token-from` (optional, {file | env})
 Datasource for the github token. One of `file` or `env` subkeys must be provided
-#### `file` (optional, string)
+#### `file` (optional[mutually-exclusive with env], string)
 File containing the github token
-#### `env` (optional, string)
+#### `env` (optional[mutually-exclusive with file], string)
 Env var containing the github token
 
 
