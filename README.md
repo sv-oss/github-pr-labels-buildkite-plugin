@@ -21,7 +21,7 @@ The variable is accessible to all subsequent commands and plugins within the sam
 steps:
   - command: echo $$PULL_REQUEST_LABELS
     plugins:
-      - sv-oss/github-pr-labels#v0.0.1:
+      - sv-oss/github-pr-labels#v0.0.2:
           publish-env-var: PULL_REQUEST_LABELS
 ```
 
@@ -36,7 +36,7 @@ The variable is accessible to all subsequent commands and plugins within the sam
 steps:
   - command: echo $$PULL_REQUEST_LABELS
     plugins:
-      - sv-oss/github-pr-labels#v0.0.1:
+      - sv-oss/github-pr-labels#v0.0.2:
           token-from:
             env: GITHUB_TOKEN
           publish-env-var: PULL_REQUEST_LABELS
@@ -53,7 +53,7 @@ The meta-data key is accessible on all subsequent steps of the pipeline.
 steps:
   - command: buildkite-agent meta-data get pull-request-labels
     plugins:
-      - sv-oss/github-pr-labels#v0.0.1:
+      - sv-oss/github-pr-labels#v0.0.2:
           token-from:
             file: /etc/github/token
           publish-metadata-key: pull-request-labels
