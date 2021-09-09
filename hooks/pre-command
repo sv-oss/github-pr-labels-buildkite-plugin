@@ -2,12 +2,12 @@
 set -euo pipefail
 
 if [[ "${BUILDKITE_PIPELINE_PROVIDER:-}" != "github" ]] ; then
-  echo ":error: this plugin can only be used on piplines associated with github repositories" >&2
+  echo "⛔️ this plugin can only be used on piplines associated with github repositories" >&2
   exit 1
 fi
 
 if [[ "${BUILDKITE_PULL_REQUEST:-false}" == "false" ]] ; then
-  echo ":warning: this doesn't appear to be a PR-build, skipping plugin execution" >&2
+  echo "⚠️ this doesn't appear to be a PR-build, skipping plugin execution" >&2
   exit 0
 fi
 pullReqNo="${BUILDKITE_PULL_REQUEST}"
@@ -16,19 +16,19 @@ repoFq=""
 if [[ "${BUILDKITE_REPO:-}" =~ github.com[:/](.*).git[/]? ]]; then
   repoFq="${BASH_REMATCH[1]}"
 else
-  echo ":error: the BUILDKITE_REPO variable has an unexpected format" >&2
+  echo "⛔️ the BUILDKITE_REPO variable has an unexpected format" >&2
   exit 2
 fi
 
 githubToken=""
 if [[ -n "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_FILE:-}" ]]; then
-  echo "~~~ :clipboard: reading github token from file"
+  echo "~~~ 📋 reading github token from file"
   githubToken=$(cat "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_FILE}")
 elif [[ -n "${BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_ENV:-}" ]]; then
-  echo "~~~ :clipboard: reading github token from env var"
+  echo "~~~ 📋 reading github token from env var"
   githubToken="${!BUILDKITE_PLUGIN_GITHUB_PR_LABELS_TOKEN_FROM_ENV}"
 else
-  echo ":warning: configuration is missing a valid 'token-from' stanza. requests to github will be unauthenticated"
+  echo "⚠️ configuration is missing a valid 'token-from' stanza. requests to github will be unauthenticated"
 fi
 
 echo "~~~ :github: retrieving pull-request labels"
