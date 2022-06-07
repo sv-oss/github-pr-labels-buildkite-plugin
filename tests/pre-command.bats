@@ -8,7 +8,7 @@ load '/usr/local/lib/bats/load.bash'
   run "$PWD/hooks/pre-command"
 
   assert_failure
-  assert_output --partial "this plugin can only be used on piplines associated with"
+  assert_output --partial "this plugin can only be used on pipelines associated with"
 }
 
 @test "ensure early exit if not a PR-build" {
