@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-if [[ "${BUILDKITE_PIPELINE_PROVIDER:-}" != "github" ]] ; then
-  echo "⛔️  this plugin can only be used on piplines associated with github repositories" >&2
+if [ "${BUILDKITE_PIPELINE_PROVIDER:-}" != "github" ] && [ "${BUILDKITE_PIPELINE_PROVIDER:-}" != "github_enterprise" ] ; then
+  echo "⛔️  this plugin can only be used on pipelines associated with github repositories" >&2
   exit 1
 fi
 
