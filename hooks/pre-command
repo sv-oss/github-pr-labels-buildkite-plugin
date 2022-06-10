@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-if [[ "${BUILDKITE_PIPELINE_PROVIDER:-}" != "github" ]] ; then
-  echo "⛔️  this plugin can only be used on piplines associated with github repositories" >&2
+if [ "${BUILDKITE_PIPELINE_PROVIDER:-}" != "github" ] && [ "${BUILDKITE_PIPELINE_PROVIDER:-}" != "github_enterprise" ] ; then
+  echo "⛔️  this plugin can only be used on pipelines associated with github repositories" >&2
   exit 1
 fi
 
@@ -12,8 +12,15 @@ if [[ "${BUILDKITE_PULL_REQUEST:-false}" == "false" ]] ; then
 fi
 pullReqNo="${BUILDKITE_PULL_REQUEST}"
 
+regexRepo=""
+if [ "${BUILDKITE_PIPELINE_PROVIDER:-}" = "github" ] ; then
+  regexRepo="github.com[:/](.*).git[/]?"
+elif [ "${BUILDKITE_PIPELINE_PROVIDER:-}" = "github_enterprise" ]; then
+  regexRepo="git@${BUILDKITE_REPO_SSH_HOST:-}[:/](.*).git[/]?"
+fi
+
 repoFq=""
-if [[ "${BUILDKITE_REPO:-}" =~ github.com[:/](.*).git[/]? ]]; then
+if [[ "${BUILDKITE_REPO:-}" =~ $regexRepo ]]; then
   repoFq="${BASH_REMATCH[1]}"
 else
   echo "⛔️  the BUILDKITE_REPO variable has an unexpected format" >&2
